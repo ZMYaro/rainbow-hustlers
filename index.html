@@ -10,12 +10,37 @@
 			var mouseX;
 			var cxt; // canvas context
 			
+			// the list of MicroWorlds colors
+			var colors = [
+				"#FFFFFF", "#EFEFEF", "#E7E7E7", "#CECECE", "#BDBDBD", "#A5A5A5", "#848484", "#636363", "#393939", "#000000",
+				"#FFE7E7", "#FFC6C6", "#FF9494", "#FF5A5A", "#FF0000", "#F70000", "#DE0000", "#C60000", "#A50000", "#7B0000",
+				"#FFEFE7", "#FFDEC6", "#FFC694", "#FFA55A", "#FF8400", "#F77B00", "#DE6B00", "#C65A00", "#A54A00", "#7B3100",
+				"#F7F7EF", "#EFE7DE", "#E7CEC6", "#D6BDA5", "#CEA584", "#BD947B", "#AD846B", "#94735A", "#7B5A4A", "#5A4231",
+				"#FFFFE7", "#FFFFC6", "#FFFF94", "#FFFF5A", "#FFFF00", "#F7F700", "#DEDE00", "#C6C600", "#A5A500", "#7B7B00",
+				"#EFFFE7", "#DEF7C6", "#C6EF94", "#A5EF5A", "#84E700", "#7BD600", "#6BC600", "#5AA500", "#4A8C00", "#316300",
+				"#E7FFE7", "#C6FFC6", "#94FF94", "#5AFF5A", "#00FF00", "#00F700", "#00DE00", "#00C600", "#00A500", "#007B00",
+				
+				"#E7FFFF", "#C6FFF7", "#94FFEF", "#5AFFEF", "#00FFE7", "#00F7D6", "#00DEBD", "#00C6A5", "#00A58C", "#007B63",
+				"#F7FFFF", "#C6FFFF", "#94FFFF", "#5AFFFF", "#00FFFF", "#00F7F7", "#00DEDE", "#00C6C6", "#00A5A5", "#007B7B",
+				"#E7F7FF", "#C6E7FF", "#94D6FF", "#5AC6FF", "#00ADFF", "#00A5F7", "#008CDE", "#007BC6", "#0063A5", "#004A7B",
+				"#E7E7FF", "#C6C6FF", "#9494FF", "#5A5AFF", "#0000FF", "#0000F7", "#0000DE", "#0000C6", "#0000A5", "#00007B",
+				"#F7E7FF", "#E7C6FF", "#D694FF", "#C65AFF", "#AD00FF", "#A500F7", "#8C00DE", "#7B00C6", "#6300A5", "#4A007B",
+				"#FFE7FF", "#FFC6FF", "#FF94FF", "#FF5AFF", "#FF00FF", "#F700F7", "#DE00DE", "#C600C6", "#A500A5", "#7B007B",
+				"#FFE7F7", "#FFC6E7", "#FF94D6", "#FF5AC6", "#FF00AD", "#F700A5", "#DE008C", "#C6007B", "#A50063", "#5A005A"
+			]
+			
 			// keys
 			var aKey = false;
 			var dKey = false;
 			var eKey = false;
+			var oKey = false;
+			var sKey = false;
+			var wKey = false;
+			var commaKey = false;
+			var downKey = false;
 			var leftKey = false;
 			var rightKey = false;
+			var upKey = false;
 			
 			var requestAnimFrame = window.requestAnimationFrame ||
 				window.webkitRequestAnimationFrame ||
@@ -74,20 +99,51 @@
 				} else if ((dKey || eKey) && !aKey) {
 					t1.heading += 5;
 				}
+				if ((wKey || commaKey) && !(sKey || oKey)) {
+					t1.speed += 0.25;
+					if (t1.speed > 512) {
+						t1.speed = 512;
+					}
+				} else if ((sKey || oKey) && !(wKey || commaKey)) {
+					t1.speed -= 0.25;
+					if (t1.speed < 0) {
+						t1.speed = 0;
+					}
+				}
 				if (leftKey && !rightKey) {
 					t2.heading -= 5;
 				} else if (rightKey && !leftKey) {
 					t2.heading += 5;
 				}
+				if (upKey && !downKey) {
+					t2.speed += 0.25;
+					if (t2.speed > 512) {
+						t2.speed = 512;
+					}
+				} else if (downKey && !upKey) {
+					t2.speed -= 0.25;
+					if (t2.speed < 0) {
+						t2.speed = 0;
+					}
+				}
 				
-				cxt.fillStyle = "rgb(" + Math.round(Math.random() * 255) + "," + Math.round(Math.random() * 255) + "," + Math.round(Math.random() * 255) + ")";
+				cxt.fillStyle = colors[t1.color];
 				cxt.fillRect(t1.x - t1.size, t1.y - t1.size, t1.size * 2, t1.size * 2);
-				cxt.fillStyle = "rgb(" + Math.round(Math.random() * 255) + "," + Math.round(Math.random() * 255) + "," + Math.round(Math.random() * 255) + ")";
+				cxt.fillStyle = colors[t2.color];
 				cxt.beginPath();
 				cxt.arc(t2.x, t2.y, t2.size, 0, (Math.PI * 2), false);
 				// arc(x, y, radius, start angle, end angle, clockwise?)
 				cxt.closePath();
 				cxt.fill();
+				
+				t1.color++;
+				if (t1.color >= colors.length) {
+					t1.color = 0;
+				}
+				t2.color++;
+				if (t2.color >= colors.length) {
+					t2.color = 0;
+				}
 				
 				requestAnimFrame(main);
 			}
@@ -98,7 +154,7 @@
 				this.heading = 270;
 				this.size = 12;
 				this.speed = 2;
-				//this.color = colors[Math.round(Math.random() * 139)];
+				this.color = Math.floor(Math.random() * colors.length);
 			}
 			
 			function keyPressed(e) {
@@ -111,19 +167,13 @@
 							leftKey = true;
 						break;
 						case 38: // up
-							t2.speed += 1;
-							if (t2.speed > 512) {
-								t2.speed = 512;
-							}
+							upKey = true;
 						break;
 						case 39: // right
 							rightKey = true;
 						break;
 						case 40: // down
-							t2.speed -= 1;
-							if (t2.speed < 0) {
-								t2.speed = 0;
-							}
+							downKey = true;
 						break;
 						
 						case 65: // A
@@ -136,28 +186,16 @@
 							eKey = true;
 						break;
 						case 79: // O
-							t1.speed -= 1;
-							if (t1.speed < 0) {
-								t1.speed = 0;
-							}
+							oKey = true;
 						break;
 						case 83: // S
-							t1.speed -= 1;
-							if (t1.speed < 0) {
-								t1.speed = 0;
-							}
+							sKey = true;
 						break;
 						case 87: // W
-							t1.speed += 1;
-							if (t1.speed > 512) {
-								t1.speed = 512;
-							}
+							wKey = true;
 						break;
 						case 188: // comma (,)
-							t1.speed += 1;
-							if (t1.speed > 512) {
-								t1.speed = 512;
-							}
+							commaKey = true;
 						break;
 					}
 				}
@@ -168,8 +206,14 @@
 						case 37:
 							leftKey = false;
 						break;
+						case 38: // up
+							upKey = false;
+						break;
 						case 39:
 							rightKey = false;
+						break;
+						case 40: // down
+							downKey = false;
 						break;
 						
 						case 65: // A
@@ -181,6 +225,18 @@
 						case 69: // E
 							eKey = false;
 						break;
+						case 79: // O
+							oKey = false;
+						break;
+						case 83: // S
+							sKey = false;
+						break;
+						case 87: // W
+							wKey = false;
+						break;
+						case 188: // comma (,)
+							commaKey = false;
+						break;
 					}
 				}
 			}
@@ -188,6 +244,13 @@
 		<style type="text/css">
 			body {
 				background-color:magenta;
+				font-family:Arial, Helvetica, sans-serif;
+			}
+			a {
+				color:#000030;
+			}
+			a:active {
+				color:#600000;
 			}
 			#content {
 				background-image:-webkit-linear-gradient(300deg, magenta, red, orange, yellow, lime, blue, violet);
@@ -204,12 +267,69 @@
 				
 				text-align:center;
 			}
+			#content footer {
+				display:block;
+				position:absolute;
+				bottom:0px;
+				left:2px;
+				right:2px;
+				
+				background-image:-webkit-linear-gradient(rgba(255,255,255,0), rgba(255,255,255,0.8));
+				background-image:   -moz-linear-gradient(rgba(255,255,255,0), rgba(255,255,255,0.8));
+				background-image:    -ms-linear-gradient(rgba(255,255,255,0), rgba(255,255,255,0.8));
+				background-image:     -o-linear-gradient(rgba(255,255,255,0), rgba(255,255,255,0.8));
+				background-image:        linear-gradient(rgba(255,255,255,0), rgba(255,255,255,0.8));
+			}
 			#title {
 				font-family:"Comic Sans MS", Arial, Helvetica, sans-serif;
 				font-size:64px;
 				font-weight:bold;
 				color:lime;
 				text-shadow:0px 0px 10px magenta;
+			}
+			#startBtn {
+				font-size:40px;
+				cursor:pointer;
+				
+				background-color:lightGray;
+				background-image:-webkit-linear-gradient(white, lightGray);
+				
+				border-style:outset;
+				border-width:1px;
+				border-color:#AAAAAA;
+				-webkit-border-radius:3px;
+				   -moz-border-radius:3px;
+				        border-radius:3px;
+				
+				text-shadow:0px 1px 1px white;
+				
+				-webkit-transition-property:-webkit-box-shadow, box-shadow;
+				-webkit-transition-duration:0.1s;
+				-webkit-transition-timing-function:linear;
+				-moz-transition-property:-webkit-box-shadow, box-shadow;
+				-moz-transition-duration:0.1s;
+				-moz-transition-timing-function:linear;
+				-ms-transition-property:-webkit-box-shadow, box-shadow;
+				-ms-transition-duration:0.1s;
+				-ms-transition-timing-function:linear;
+				-o-transition-property:-webkit-box-shadow, box-shadow;
+				-o-transition-duration:0.1s;
+				-o-transition-timing-function:linear;
+				transition-property:-webkit-box-shadow, box-shadow;
+				transition-duration:0.1s;
+				transition-timing-function:linear;
+			}
+			#startBtn:hover {
+				-webkit-box-shadow:0px 0px 14px 4px #A010F0;
+				   -moz-box-shadow:0px 0px 14px 4px #A010F0;
+				        box-shadow:0px 0px 14px 4px #A010F0;
+			}
+			#startBtn:active {
+				background-image:-webkit-linear-gradient(lightGray, white);
+				border-style:inset;
+				-webkit-box-shadow:0px 0px 10px 2px #A010F0;
+				   -moz-box-shadow:0px 0px 10px 2px #A010F0;
+				        box-shadow:0px 0px 10px 2px #A010F0;
 			}
 			#canvas {
 				background-image:-webkit-linear-gradient(300deg, magenta, red, orange, yellow, lime, blue, violet);
@@ -234,10 +354,18 @@
 		<canvas id="canvas" width="1024" height="768">Your browser does not support canvas.  Please install Google Chrome or something with similar awesomeness.</canvas>
 		<div id="content">
 			<header id="title">Rainbow Hustlers</header>
-			<span style="font-size:10pt;">Version 1.1</span>
+			<span style="font-size:10pt;">Version 2.0</span>
 			<br/>
 			<br/>
-			<button style="font-size:40px;" onclick="init();">Start</button>
+			<button id="startBtn" onclick="init();">Start</button>
+			<br/>
+			<footer>
+				<span style="float:left;">
+					By Zachary &ldquo;Gamer_Z.&rdquo; Yaro | Original <i>Rainbow Hustlers</i> by Ryan Campbell
+				</span>
+				<span style="float:right;">
+					<a href="http://mysite.verizon.net/zmyaro/rainbowhustlers" target="_blank">http://mysite.verizon.net/zmyaro/rainbowhustlers</a>
+				</span>
 		</div>
 	</body>
 </html>
