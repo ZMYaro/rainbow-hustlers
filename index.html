@@ -1,0 +1,243 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Rainbow Hustlers</title>
+		<script type="text/javascript">
+			var width = 1024;
+			var height = 768;
+			var t1;
+			var mouseControl = true;
+			var mouseX;
+			var cxt; // canvas context
+			
+			// keys
+			var aKey = false;
+			var dKey = false;
+			var eKey = false;
+			var leftKey = false;
+			var rightKey = false;
+			
+			var requestAnimFrame = window.requestAnimationFrame ||
+				window.webkitRequestAnimationFrame ||
+				window.mozRequestAnimationFrame ||
+				window.msRequestAnimationFrame ||
+				window.oRequestAnimationFrame ||
+				function(callback) {
+					setTimeout(callback, 60.0 / 1000);
+				}
+			function init() {
+				document.getElementById("content").style.visibility = "hidden";
+				
+				t1 = new Turtle();
+				t2 = new Turtle();
+				t2.heading = 90;
+				
+				cxt = document.getElementById("canvas").getContext("2d");
+				
+				document.addEventListener("keydown", keyPressed, false);
+				document.addEventListener("keyup", keyReleased, false);
+				
+				requestAnimFrame(main);
+			}
+			function main() {
+				// t1 stuff
+				t1.x += Math.cos(t1.heading * Math.PI / 180) * t1.speed;
+				if (t1.x < (-t1.size)) {
+					t1.x = width;
+				} else if (t1.x > (width + t1.size)) {
+					t1.x = 0;
+				}
+				t1.y += Math.sin(t1.heading * Math.PI / 180) * t1.speed;
+				if (t1.y < (-t1.size)) {
+					t1.y = height;
+				} else if (t1.y > (height + t1.size)) {
+					t1.y = 0;
+				}
+				
+				// t2 stuff
+				t2.x += Math.cos(t2.heading * Math.PI / 180) * t2.speed;
+				if (t2.x < (-t2.size)) {
+					t2.x = width;
+				} else if (t2.x > (width + t2.size)) {
+					t2.x = 0;
+				}
+				t2.y += Math.sin(t2.heading * Math.PI / 180) * t2.speed;
+				if (t2.y < (-t2.size)) {
+					t2.y = height;
+				} else if (t2.y > (height + t2.size)) {
+					t2.y = 0;
+				}
+				
+				// user input
+				if (aKey && !(dKey || eKey)) {
+					t1.heading -= 5;
+				} else if ((dKey || eKey) && !aKey) {
+					t1.heading += 5;
+				}
+				if (leftKey && !rightKey) {
+					t2.heading -= 5;
+				} else if (rightKey && !leftKey) {
+					t2.heading += 5;
+				}
+				
+				cxt.fillStyle = "rgb(" + Math.round(Math.random() * 255) + "," + Math.round(Math.random() * 255) + "," + Math.round(Math.random() * 255) + ")";
+				cxt.fillRect(t1.x - t1.size, t1.y - t1.size, t1.size * 2, t1.size * 2);
+				cxt.fillStyle = "rgb(" + Math.round(Math.random() * 255) + "," + Math.round(Math.random() * 255) + "," + Math.round(Math.random() * 255) + ")";
+				cxt.beginPath();
+				cxt.arc(t2.x, t2.y, t2.size, 0, (Math.PI * 2), false);
+				// arc(x, y, radius, start angle, end angle, clockwise?)
+				cxt.closePath();
+				cxt.fill();
+				
+				requestAnimFrame(main);
+			}
+
+			function Turtle() {
+				this.x = Math.round(width / 2.0);
+				this.y = Math.round(height / 2.0);
+				this.heading = 270;
+				this.size = 12;
+				this.speed = 2;
+				this.color = colors[Math.round(Math.random() * 139)];
+			}
+			
+			function keyPressed(e) {
+				if (e.keyCode) {
+					switch (e.keyCode) {
+						case 27: // esc
+							location.reload();
+						break;
+						case 37: // left
+							leftKey = true;
+						break;
+						case 38: // up
+							t2.speed += 1;
+							if (t2.speed > 512) {
+								t2.speed = 512;
+							}
+						break;
+						case 39: // right
+							rightKey = true;
+						break;
+						case 40: // down
+							t2.speed -= 1;
+							if (t2.speed < 0) {
+								t2.speed = 0;
+							}
+						break;
+						
+						case 65: // A
+							aKey = true;
+						break;
+						case 68: // D
+							dKey = true;
+						break;
+						case 69: // E
+							eKey = true;
+						break;
+						case 79: // O
+							t1.speed -= 1;
+							if (t1.speed < 0) {
+								t1.speed = 0;
+							}
+						break;
+						case 83: // S
+							t1.speed -= 1;
+							if (t1.speed < 0) {
+								t1.speed = 0;
+							}
+						break;
+						case 87: // W
+							t1.speed += 1;
+							if (t1.speed > 512) {
+								t1.speed = 512;
+							}
+						break;
+						case 188: // comma (,)
+							t1.speed += 1;
+							if (t1.speed > 512) {
+								t1.speed = 512;
+							}
+						break;
+					}
+				}
+			}
+			function keyReleased(e) {
+				if (e.keyCode) {
+					switch (e.keyCode) {
+						case 37:
+							leftKey = false;
+						break;
+						case 39:
+							rightKey = false;
+						break;
+						
+						case 65: // A
+							aKey = false;
+						break;
+						case 68: // D
+							dKey = false;
+						break;
+						case 69: // E
+							eKey = false;
+						break;
+					}
+				}
+			}
+		</script>
+		<style type="text/css">
+			body {
+				background-color:magenta;
+			}
+			#content {
+				background-image:-webkit-linear-gradient(300deg, magenta, red, orange, yellow, lime, blue, violet);
+				background-image:   -moz-linear-gradient(300deg, magenta, red, orange, yellow, lime, blue, violet);
+				background-image:    -ms-linear-gradient(300deg, magenta, red, orange, yellow, lime, blue, violet);
+				background-image:     -o-linear-gradient(300deg, magenta, red, orange, yellow, lime, blue, violet);
+				background-image:        linear-gradient(300deg, magenta, red, orange, yellow, lime, blue, violet);
+				
+				position:absolute;
+				left:0px;
+				right:0px;
+				top:0px;
+				bottom:0px;
+				
+				text-align:center;
+			}
+			#title {
+				font-family:"Comic Sans MS", Arial, Helvetica, sans-serif;
+				font-size:64px;
+				font-weight:bold;
+				color:lime;
+				text-shadow:0px 0px 10px magenta;
+			}
+			#canvas {
+				background-image:-webkit-linear-gradient(300deg, magenta, red, orange, yellow, lime, blue, violet);
+				background-image:   -moz-linear-gradient(300deg, magenta, red, orange, yellow, lime, blue, violet);
+				background-image:    -ms-linear-gradient(300deg, magenta, red, orange, yellow, lime, blue, violet);
+				background-image:     -o-linear-gradient(300deg, magenta, red, orange, yellow, lime, blue, violet);
+				background-image:        linear-gradient(300deg, magenta, red, orange, yellow, lime, blue, violet);
+				
+				margin:auto;
+				border-width:0px;
+				border-style:none;
+				
+				position:absolute;
+				top:0px;
+				left:0px;
+				width:100%;
+				height:100%;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="canvas" width="1024" height="768">Your browser does not support canvas.  Please install Google Chrome or something with similar awesomeness.</canvas>
+		<div id="content">
+			<header id="title">Rainbow Hustlers</header>
+			<span style="font-size:10pt;">Version 1.1</span>
+			<br/>
+			<br/>
+			<button style="font-size:40px;" onclick="init();">Start</button>
+		</div>
+	</body>
+</html>
